@@ -346,7 +346,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const isRevealed = gameState.guessedLetters.has(normalizedChar);
 
-            return `<div class="word-letter ${isRevealed ? 'revealed' : ''} w-8 h-12 sm:w-12 sm:h-20 perspective-[500px]"><div class="relative w-full h-full letter-inner"><div class="absolute w-full h-full flex items-center justify-center text-2xl sm:text-4xl font-bold border-b-4 border-slate-400 rounded-lg backface-hidden">${isRevealed ? char : ''}</div></div></div>`;
+            return `<div class="word-letter ${isRevealed ? 'revealed' : ''} w-8 h-12 sm:w-12 sm:h-20 perspective-[500px]"><div class="relative w-full h-full flex items-center justify-center text-2xl sm:text-4xl font-bold border-b-4 border-slate-400 rounded-lg backface-hidden">${isRevealed ? char : ''}</div></div>`;
         }).join('');
     }
 
@@ -408,19 +408,17 @@ document.addEventListener('DOMContentLoaded', () => {
         let html = '';
         if (gameState.mode === 'players') {
             const wordMaster = gameState.players[gameState.playerIndex];
-            html = `<div class="text-center"><div class="font-bold">الكلمة من: ${wordMaster}</div><div class="text-sm">الأخطاء: ${gameState.wrongGuesses} / ${gameState.maxMistakes}</div></div>`;
+            html = `<div class="text-center w-full"><div class="font-bold text-sm sm:text-base">الكلمة من: ${wordMaster}</div><div class="text-xs sm:text-sm">الأخطاء: ${gameState.wrongGuesses} / ${gameState.maxMistakes}</div></div>`;
         } else { // teams
-            const wordMasterTeamKey = gameState.currentTeam;
-            const guessingTeamKey = wordMasterTeamKey === 'teamA' ? 'teamB' : 'teamA';
             const teamAName = gameState.teamNames.teamA;
             const teamBName = gameState.teamNames.teamB;
+            const guessingTeamKey = gameState.currentTeam === 'teamA' ? 'teamB' : 'teamA';
             const guessingTeamName = gameState.teamNames[guessingTeamKey];
 
-            html = `<span class="text-[--primary] font-extrabold">${teamAName}: ${gameState.scores['teamA']}</span> 
-                    <span class="mx-1 sm:mx-2 text-slate-400">|</span> 
-                    <span class="text-blue-500 font-extrabold">${teamBName}: ${gameState.scores['teamB']}</span>
-                    <span class="mx-1 sm:mx-2 text-slate-400">|</span> 
-                    <span class="hidden sm:inline">التخمين: فريق ${guessingTeamName}</span>`;
+            html = `<span class="text-[--primary] font-extrabold text-sm sm:text-base">${teamAName}: ${gameState.scores['teamA']}</span> 
+                    <span class="mx-0.5 sm:mx-1 text-slate-400">|</span> 
+                    <span class="text-blue-500 font-extrabold text-sm sm:text-base">${teamBName}: ${gameState.scores['teamB']}</span>
+                    <span class="w-full text-xs sm:text-sm mt-1">التخمين: فريق ${guessingTeamName}</span>`;
         }
         status.innerHTML = html;
     }
