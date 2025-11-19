@@ -1,21 +1,21 @@
 :root {
     /* -------------------------------------- */
-    /* COLOR PALETTE - MATCHING YOUR LOGO (#708D43) */
+    /* COLOR PALETTE - VINTAGE OLIVE GREEN THEME */
     /* -------------------------------------- */
     --bg: #F8F9FA; 
     --text: #1F2937; 
     
-    /* Primary color from the logo's green */
-    --primary: #708D43;       
+    /* Primary color: Deep Olive Green (User Request) */
+    --primary: #54693b;       
     
-    /* A darker version of the primary color for hover effects */
-    --primary-dark: #5C7436;  
+    /* Darker shade for hover effects and borders */
+    --primary-dark: #44542f;  
     
-    /* Standard Status Colors */
-    --success: #22C55E; 
-    --error: #EF4444; 
-    --line: #E5E7EB; 
-    --card: #FFFFFF;
+    /* Status Colors adjusted for contrast */
+    --success: #3D8B40; /* Slightly desaturated green */
+    --error: #D9534F;   /* Slightly desaturated red */
+    --line: #D0D0D0;    /* Card dividing lines */
+    --card: #FFFFFF;    /* Inner Card Backgrounds */
     
     --shadow-light: 0 4px 15px rgba(0,0,0,0.08);
     --shadow-medium: 0 8px 25px rgba(0,0,0,0.1);
@@ -28,8 +28,11 @@ html, body {
 
 body {
     font-family: 'Noto Kufi Arabic', sans-serif;
-    /* Updated Gradient to be slightly softer to let the logo pop */
-    background: linear-gradient(135deg, #eef7fa 0%, #dfeaf2 100%);
+    /* New Earthy Background Gradient (User Request) */
+    background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
+    --bg-start: #e9dfc7; /* User requested base color */
+    --bg-end: #dcd0b1;   /* Matching darker end for gradient */
+    
     color: var(--text);
     transition: background-color 0.5s ease;
     overflow: hidden;
@@ -48,7 +51,7 @@ body {
     max-height: 150px; /* Limits height on large screens */
     display: block;
     object-fit: contain;
-    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); /* Adds subtle depth */
+    filter: drop-shadow(0 6px 8px rgba(0,0,0,0.15)); /* Increased shadow for depth */
 }
 
 #background-effects {
@@ -66,7 +69,8 @@ body {
     position: absolute;
     bottom: -50px;
     font-size: 2rem;
-    color: rgba(154, 208, 221, 0.3);
+    /* Floating letters match the new primary color (User Request) */
+    color: rgba(84, 105, 59, 0.3); /* #54693b with 30% opacity */
     animation: floatUp 15s linear infinite;
 }
 
@@ -83,6 +87,8 @@ body {
     transition: all 0.2s ease-in-out;
     border: 2px solid transparent;
     box-shadow: var(--shadow-light);
+    /* Adding subtle border radius for soft look */
+    border-radius: 0.75rem; 
 }
 .btn:hover { transform: translateY(-3px); box-shadow: var(--shadow-medium); }
 .btn-primary { background-color: var(--primary); color: white; }
@@ -142,7 +148,7 @@ dialog > div { padding: 1.5rem; }
     dialog > div { padding: 2rem; }
 }
 
-/* Hangman Styles */
+/* Hangman Styles - Keeping these neutral (slate) for contrast */
 #hangman-container {
     width: 200px;
     height: 250px;
