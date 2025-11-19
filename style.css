@@ -12,11 +12,11 @@
     --primary-dark: #44542f;  
     
     /* Status Colors adjusted for contrast */
-    --success: #3D8B40; /* Slightly desaturated green */
-    --error: #D9534F;   /* Slightly desaturated red */
-    --line: #D0D0D0;    /* Card dividing lines */
+    --success: #3D8B40; 
+    --error: #D9534F;   
+    --line: #D0D0D0;    
     
-    /* UPDATED: Card background is now a soft cream */
+    /* Card background is a soft cream */
     --card: #fcf9f1;    
     
     --shadow-light: 0 4px 15px rgba(0,0,0,0.08);
@@ -25,14 +25,14 @@
 
 html, body {
     height: 100%;
-    overscroll-behavior: none; /* Prevents pull-to-refresh on mobile */
+    overscroll-behavior: none;
 }
 
 body {
     font-family: 'Noto Kufi Arabic', sans-serif;
-    /* New Earthy Background Gradient (User Request) */
-    --bg-start: #e9dfc7; /* User requested base color */
-    --bg-end: #dcd0b1;   /* Matching darker end for gradient */
+    /* Earthy Background Gradient */
+    --bg-start: #e9dfc7; 
+    --bg-end: #dcd0b1;   
     background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
     
     color: var(--text);
@@ -46,14 +46,27 @@ body {
     height: 100%;
 }
 
-/* Logo Styling */
-.app-logo {
-    max-width: 80%;   /* Fits well on mobile */
-    height: auto;     /* Maintains aspect ratio */
-    max-height: 150px; /* Limits height on large screens */
+/* -------------------------------------- */
+/* LOGO STYLING */
+/* -------------------------------------- */
+/* Large Logo on Landing Page */
+.landing-logo {
+    max-width: 80%;
+    height: auto;
+    max-height: 150px;
     display: block;
     object-fit: contain;
-    filter: drop-shadow(0 6px 8px rgba(0,0,0,0.15)); /* Increased shadow for depth */
+    filter: drop-shadow(0 6px 8px rgba(0,0,0,0.15));
+}
+
+/* Small Logo in Game Header */
+#game-logo {
+    height: 32px; 
+    width: auto;
+    object-fit: contain;
+    margin-left: 0.5rem; /* Space between logo and status text */
+    margin-right: 0.5rem;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));
 }
 
 #background-effects {
@@ -71,8 +84,7 @@ body {
     position: absolute;
     bottom: -50px;
     font-size: 2rem;
-    /* Floating letters match the new primary color (User Request) */
-    color: rgba(84, 105, 59, 0.3); /* #54693b with 30% opacity */
+    color: rgba(84, 105, 59, 0.3);
     animation: floatUp 15s linear infinite;
 }
 
@@ -89,7 +101,6 @@ body {
     transition: all 0.2s ease-in-out;
     border: 2px solid transparent;
     box-shadow: var(--shadow-light);
-    /* Adding subtle border radius for soft look */
     border-radius: 0.75rem; 
 }
 .btn:hover { transform: translateY(-3px); box-shadow: var(--shadow-medium); }
@@ -150,7 +161,7 @@ dialog > div { padding: 1.5rem; }
     dialog > div { padding: 2rem; }
 }
 
-/* Hangman Styles - Keeping these neutral (slate) for contrast */
+/* Hangman Styles */
 #hangman-container {
     width: 200px;
     height: 250px;
