@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لعبة المشنقة</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="antialiased text-center">
+  
+  <div id="background-effects"></div>
+  
+  <div id="app" class="flex flex-col items-center justify-center min-h-screen w-full p-2 sm:p-4 relative z-10">
+
+    <!-- Landing Page -->
+    <div id="landing-page" class="page active flex-col items-center justify-center w-full max-w-lg mx-auto bg-[--card] p-6 sm:p-8 rounded-2xl shadow-xl">
+      
+      <!-- UPDATED: Logo Image -->
+      <div class="logo-container mb-6">
+        <img src="Hang-logo.png" alt="Hangman Logo" class="app-logo mx-auto">
+      </div>
+
+      <p class="text-lg sm:text-xl text-slate-600 mb-12 font-medium">اختر طريقة اللعب!</p>
+      
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+        <button data-mode="players" class="mode-btn btn btn-primary p-4 rounded-xl text-xl font-bold">🙋‍♂️ اللعب الجماعي</button>
+        <button data-mode="teams" class="mode-btn btn btn-primary p-4 rounded-xl text-xl font-bold">🤝 وضع التحدي</button>
+      </div>
+      
+      <div class="flex items-center justify-center gap-4 mt-8">
+        <button id="how-to-play-btn" class="text-slate-500 hover:text-[--primary] font-semibold transition-colors">📖 كيف ألعب؟</button>
+      </div>
+    </div>
+
+    <!-- Setup Page -->
+    <div id="setup-page" class="page flex-col items-center justify-center w-full max-w-2xl mx-auto">
+      <h2 id="setup-title" class="text-3xl sm:text-4xl font-extrabold mb-8 text-[--text]">إعداد اللعبة</h2>
+      <div id="setup-content" class="w-full bg-[--card] p-4 sm:p-6 rounded-2xl shadow-xl"></div>
+      <div class="flex items-center gap-4 mt-8">
+        <button id="back-to-landing-btn" class="btn bg-slate-200 text-slate-700 px-6 sm:px-8 py-3 rounded-full font-bold">رجوع</button>
+        <button id="start-game-btn" class="btn btn-primary px-6 sm:px-8 py-3 rounded-full font-bold text-lg">🚀 ابدأ اللعب</button>
+      </div>
+    </div>
+
+    <!-- Word Entry Page -->
+    <div id="word-entry-page" class="page flex-col items-center justify-center w-full max-w-lg mx-auto">
+      <div class="w-full bg-[--card] p-6 sm:p-8 rounded-2xl shadow-xl text-center">
+        <h2 id="word-entry-title" class="text-2xl sm:text-3xl font-extrabold mb-2 text-[--text]">إدخال الكلمة</h2>
+        <p id="word-entry-instruction" class="text-slate-600 mb-6">على الآخرين عدم النظر!</p>
+        <div class="word-input-wrapper mb-4">
+            <input type="password" id="secret-word-input" class="w-full text-center text-xl sm:text-2xl p-3 border-2 border-[--line] rounded-lg focus:border-[--primary] focus:outline-none" placeholder="اكتب الكلمة هنا...">
+            <span id="toggle-password">👁️</span>
+        </div>
+        <input type="text" id="secret-word-hint" class="w-full text-center text-md sm:text-lg p-2 border-2 border-[--line] rounded-lg focus:border-[--primary] focus:outline-none mb-2" placeholder="تلميح (اختياري)...">
+        <button id="suggest-word-btn" class="text-sm text-slate-500 hover:text-[--primary] font-semibold mb-4 transition-colors">🤔 محتار؟ اضغط لاقتراح كلمة</button>
+        <p id="word-entry-error" class="text-[--error] mt-2 h-6 font-bold"></p>
+        <button id="confirm-word-btn" class="btn btn-primary w-full mt-4 py-3 rounded-lg font-bold text-lg">تأكيد</button>
+      </div>
+    </div>
+
+    <!-- Game Page -->
+    <div id="game-page" class="page flex-col items-center justify-between w-full h-full py-2 sm:py-4">
+        <header id="game-header" class="w-full max-w-4xl mx-auto flex justify-between items-center p-2 rounded-xl bg-[--card] shadow-xl text-xs sm:text-base">
+            <button id="game-home-btn" class="btn bg-slate-200 text-slate-700 px-3 py-2 sm:px-4 sm:py-2 rounded-lg font-bold">🏠</button>
+            <div id="game-status" class="flex flex-wrap justify-center items-center gap-2 sm:gap-4 font-bold"></div>
+            <div id="power-ups" class="flex items-center gap-2">
+              <button id="hint-btn" class="btn bg-blue-100 text-blue-600 px-3 py-2 sm:px-4 sm:py-2 rounded-lg font-bold" title="عرض التلميح">💡</button>
+            </div>
+        </header>
+
+        <main class="flex flex-col items-center justify-center flex-grow w-full">
+            <div id="hangman-container" class="relative my-2 sm:my-4">
+                <!-- Gallows structure -->
+                <div class="gallows-part bottom-0 left-0 w-full h-2 rounded-full"></div>
+                <div class="gallows-part bottom-0 left-8 w-2 h-full"></div>
+                <div class="gallows-part top-0 left-8 w-3/4 h-2"></div>
+                <div class="gallows-part rope"></div>
+
+                <!-- Hangman figure parts -->
+                <div id="hangman-figure">
+                    <div id="hangman-head" class="hangman-part hidden"></div>
+                    <div id="hangman-body" class="hangman-part hidden"></div>
+                    <div id="hangman-arm-left" class="hangman-part hidden"></div>
+                    <div id="hangman-arm-right" class="hangman-part hidden"></div>
+                    <div id="hangman-leg-left" class="hangman-part hidden"></div>
+                    <div id="hangman-leg-right" class="hangman-part hidden"></div>
+                    <div id="hangman-eye-left" class="hangman-face-part hidden"></div>
+                    <div id="hangman-eye-right" class="hangman-face-part hidden"></div>
+                    <div id="hangman-mouth" class="hangman-face-part hidden"></div>
+                    <div id="hangman-ear-left" class="hangman-face-part hidden"></div>
+                    <div id="hangman-ear-right" class="hangman-face-part hidden"></div>
+                    <div id="hangman-hair" class="hangman-face-part hidden"></div>
+                </div>
+            </div>
+            <div id="word-display" class="flex flex-wrap justify-center gap-1 sm:gap-2 my-2 sm:my-4" style="direction: rtl;"></div>
+        </main>
+
+        <footer class="w-full max-w-4xl mx-auto">
+            <div id="keyboard" class="grid grid-cols-7 sm:grid-cols-10 gap-1 sm:gap-2 p-2 bg-[--card] rounded-2xl shadow-xl"></div>
+        </footer>
+    </div>
+  </div>
+
+  <!-- How to Play Modal -->
+  <dialog id="how-to-play-modal">
+    <div>
+      <h3 class="text-2xl font-bold mb-4">📖 كيف ألعب؟</h3>
+      <p class="mb-2"><strong>🙋‍♂️ اللعب الجماعي:</strong> أدخل أسماء اللاعبين. اللاعب الأول يضع كلمة والآخرون يخمنونها.</p>
+      <p class="mb-4"><strong>🤝 وضع التحدي:</strong> فريق ضد فريق! الفريق الفائز بالجولة يحصل على نقطة.</p>
+      <div class="text-center mt-6"><button id="close-how-to-play-btn" class="btn btn-primary px-6 py-2 rounded-full">فهمت!</button></div>
+    </div>
+  </dialog>
+  
+  <!-- Word Suggestion Modal -->
+  <dialog id="word-suggestion-modal">
+    <div>
+      <h3 class="text-2xl font-bold mb-4">🤔 كلمات مقترحة</h3>
+      <div id="suggestion-list" class="space-y-2"></div>
+      <button id="close-suggestion-btn" class="btn btn-primary px-8 py-2 rounded-full font-bold mt-6">إغلاق</button>
+    </div>
+  </dialog>
+  
+  <!-- Hint Modal -->
+  <dialog id="hint-modal">
+    <div>
+      <h3 class="text-2xl font-bold mb-4">💡 تلميح</h3>
+      <p id="hint-text" class="text-xl text-slate-700 mb-6"></p>
+      <div class="text-center mt-6">
+        <button id="close-hint-btn" class="btn btn-primary px-6 py-2 rounded-full">حسنًا</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Game Over Modal -->
+  <dialog id="game-over-modal">
+    <div>
+      <h3 id="game-over-title" class="text-5xl mb-4">🎉</h3>
+      <p id="game-over-message" class="text-xl text-slate-700 mb-2"></p>
+      <p class="text-lg mb-6">الكلمة كانت: <strong id="game-over-word" class="text-[--primary] text-2xl"></strong></p>
+      <div id="final-score-display" class="font-bold text-lg mb-4"></div>
+      <div class="flex justify-center gap-4">
+        <button id="game-over-home-btn" class="btn bg-slate-200 text-slate-700 px-6 py-2 rounded-full font-bold">الرئيسية</button>
+        <button id="next-action-btn" class="btn btn-primary px-6 py-2 rounded-full font-bold">الدور التالي</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Alert Modal -->
+  <dialog id="alert-modal">
+    <div>
+      <h3 id="alert-title" class="text-2xl font-bold mb-4">تنبيه!</h3>
+      <p id="alert-message" class="text-lg text-slate-700 mb-6"></p>
+      <div class="text-center mt-6">
+        <button id="close-alert-btn" class="btn btn-primary px-6 py-2 rounded-full">حسنًا</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Game Logic -->
+  <script src="script.js"></script>
+</body>
+</html>
