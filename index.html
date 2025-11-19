@@ -29,8 +29,8 @@
       <p class="text-lg sm:text-xl text-slate-600 mb-12 font-medium">اختر طريقة اللعب!</p>
       
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
-        <button data-mode="players" class="mode-btn btn btn-primary p-4 rounded-xl text-xl font-bold"> اللعب الجماعي</button>
-        <button data-mode="teams" class="mode-btn btn btn-primary p-4 rounded-xl text-xl font-bold"> وضع التحدي</button>
+        <button data-mode="players" class="mode-btn btn btn-primary p-4 rounded-xl text-xl font-bold">اللعب الجماعي</button>
+        <button data-mode="teams" class="mode-btn btn btn-primary p-4 rounded-xl text-xl font-bold">وضع التحدي</button>
       </div>
       
       <div class="flex items-center justify-center gap-4 mt-8">
@@ -43,8 +43,9 @@
       <h2 id="setup-title" class="text-3xl sm:text-4xl font-extrabold mb-8 text-[--text]">إعداد اللعبة</h2>
       <div id="setup-content" class="w-full bg-[--card] p-4 sm:p-6 rounded-2xl shadow-xl"></div>
       <div class="flex items-center gap-4 mt-8">
-        <button id="back-to-landing-btn" class="btn bg-slate-200 text-slate-700 px-6 sm:px-8 py-3 rounded-full font-bold">رجوع</button>
+        <!-- Button order reversed for RTL: Primary action (Start) is on the right -->
         <button id="start-game-btn" class="btn btn-primary px-6 sm:px-8 py-3 rounded-full font-bold text-lg">🚀 ابدأ اللعب</button>
+        <button id="back-to-landing-btn" class="btn bg-slate-200 text-slate-700 px-6 sm:px-8 py-3 rounded-full font-bold">رجوع</button>
       </div>
     </div>
 
@@ -145,8 +146,9 @@
       <p class="text-lg mb-6">الكلمة كانت: <strong id="game-over-word" class="text-[--primary] text-2xl"></strong></p>
       <div id="final-score-display" class="font-bold text-lg mb-4"></div>
       <div class="flex justify-center gap-4">
-        <button id="game-over-home-btn" class="btn bg-slate-200 text-slate-700 px-6 py-2 rounded-full font-bold">الرئيسية</button>
+        <!-- Button order reversed for RTL: Primary action (Next) is on the right -->
         <button id="next-action-btn" class="btn btn-primary px-6 py-2 rounded-full font-bold">الدور التالي</button>
+        <button id="game-over-home-btn" class="btn bg-slate-200 text-slate-700 px-6 py-2 rounded-full font-bold">الرئيسية</button>
       </div>
     </div>
   </dialog>
