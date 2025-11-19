@@ -1,15 +1,15 @@
 :root {
     /* -------------------------------------- */
-    /* COLOR PALETTE - MATCH YOUR LOGO HERE   */
+    /* COLOR PALETTE - MATCHING YOUR LOGO (#708D43) */
     /* -------------------------------------- */
     --bg: #F8F9FA; 
     --text: #1F2937; 
     
-    /* Change this hex code to match your Logo's main color */
-    --primary: #14B8A6;       
+    /* Primary color from the logo's green */
+    --primary: #708D43;       
     
-    /* A darker version of your logo color for hover effects */
-    --primary-dark: #0F766E;  
+    /* A darker version of the primary color for hover effects */
+    --primary-dark: #5C7436;  
     
     /* Standard Status Colors */
     --success: #22C55E; 
