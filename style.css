@@ -1,0 +1,327 @@
+:root {
+    /* -------------------------------------- */
+    /* COLOR PALETTE - MATCH YOUR LOGO HERE   */
+    /* -------------------------------------- */
+    --bg: #F8F9FA; 
+    --text: #1F2937; 
+    
+    /* Change this hex code to match your Logo's main color */
+    --primary: #14B8A6;       
+    
+    /* A darker version of your logo color for hover effects */
+    --primary-dark: #0F766E;  
+    
+    /* Standard Status Colors */
+    --success: #22C55E; 
+    --error: #EF4444; 
+    --line: #E5E7EB; 
+    --card: #FFFFFF;
+    
+    --shadow-light: 0 4px 15px rgba(0,0,0,0.08);
+    --shadow-medium: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+html, body {
+    height: 100%;
+    overscroll-behavior: none; /* Prevents pull-to-refresh on mobile */
+}
+
+body {
+    font-family: 'Noto Kufi Arabic', sans-serif;
+    /* Updated Gradient to be slightly softer to let the logo pop */
+    background: linear-gradient(135deg, #eef7fa 0%, #dfeaf2 100%);
+    color: var(--text);
+    transition: background-color 0.5s ease;
+    overflow: hidden;
+}
+
+#app {
+    position: relative;
+    z-index: 1;
+    height: 100%;
+}
+
+/* Logo Styling */
+.app-logo {
+    max-width: 80%;   /* Fits well on mobile */
+    height: auto;     /* Maintains aspect ratio */
+    max-height: 150px; /* Limits height on large screens */
+    display: block;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); /* Adds subtle depth */
+}
+
+#background-effects {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.floating-letter {
+    position: absolute;
+    bottom: -50px;
+    font-size: 2rem;
+    color: rgba(154, 208, 221, 0.3);
+    animation: floatUp 15s linear infinite;
+}
+
+@keyframes floatUp {
+    0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+    10%, 90% { opacity: 1; }
+    100% { transform: translateY(-105vh) rotate(360deg); opacity: 0; }
+}
+
+.page { display: none; height: 100%; }
+.page.active { display: flex; }
+
+.btn {
+    transition: all 0.2s ease-in-out;
+    border: 2px solid transparent;
+    box-shadow: var(--shadow-light);
+}
+.btn:hover { transform: translateY(-3px); box-shadow: var(--shadow-medium); }
+.btn-primary { background-color: var(--primary); color: white; }
+.btn-primary:hover { background-color: var(--primary-dark); }
+
+.keyboard-btn {
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    background-color: var(--card);
+}
+.keyboard-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+.keyboard-btn:disabled { opacity: 0.5; box-shadow: none; cursor: not-allowed; }
+.keyboard-btn.correct { background-color: var(--success); color: white; transform: scale(1.05); }
+.keyboard-btn.incorrect { background-color: var(--error); color: white; animation: shake 0.5s; }
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); } 10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.word-letter {
+    transition: all 0.5s ease;
+    transform-style: preserve-3d;
+}
+.word-letter.revealed .letter-inner { transform: rotateX(360deg); }
+.letter-inner { transition: transform 0.6s; position: relative; }
+.letter-inner > div {
+    background-color: var(--card);
+    border: 2px solid var(--line);
+    border-radius: 8px;
+    box-shadow: var(--shadow-light);
+}
+.word-letter.revealed .letter-inner > div {
+    background-color: var(--primary);
+    color: white;
+    border-color: var(--primary-dark);
+    box-shadow: var(--shadow-medium);
+}
+
+.difficulty-btn.active {
+    box-shadow: 0 0 0 3px var(--primary);
+    transform: translateY(-2px);
+}
+
+dialog {
+    border: none;
+    padding: 0;
+    border-radius: 1rem;
+    box-shadow: var(--shadow-medium);
+    background-color: var(--card);
+    max-width: 90%;
+    width: 500px;
+}
+dialog::backdrop { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); }
+dialog > div { padding: 1.5rem; }
+@media (min-width: 640px) {
+    dialog > div { padding: 2rem; }
+}
+
+/* Hangman Styles */
+#hangman-container {
+    width: 200px;
+    height: 250px;
+    transform-origin: center top;
+}
+.gallows-part { background-color: #475569; position: absolute; border-radius: 3px; }
+.gallows-part.rope {
+    width: 6px; height: 45px;
+    top: 0; left: 160px;
+    border-radius: 6px 6px 0 0;
+    transform: translateX(-50%);
+}
+
+#hangman-figure {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transition: transform 1s ease-in;
+}
+.hangman-part {
+    background-color: #475569;
+    border: 2px solid #334155;
+    position: absolute;
+    transition: transform 0.2s ease-out, opacity 0.2s ease-out;
+}
+
+#hangman-head {
+    width: 40px; height: 40px; border-radius: 50%;
+    top: 40px; left: 140px;
+}
+#hangman-body {
+    width: 5px; height: 60px; border-radius: 3px;
+    top: 80px; left: 158px;
+}
+#hangman-arm-left {
+    width: 5px; height: 40px; border-radius: 3px;
+    top: 90px; left: 150px; transform: rotate(20deg); transform-origin: top center;
+}
+#hangman-arm-right {
+    width: 5px; height: 40px; border-radius: 3px;
+    top: 90px; left: 165px; transform: rotate(-20deg); transform-origin: top center;
+}
+#hangman-leg-left {
+    width: 5px; height: 45px; border-radius: 3px;
+    top: 135px; left: 150px; transform: rotate(20deg); transform-origin: top center;
+}
+#hangman-leg-right {
+    width: 5px; height: 45px; border-radius: 3px;
+    top: 135px; left: 165px; transform: rotate(-20deg); transform-origin: top center;
+}
+.hangman-face-part {
+    background-color: white;
+    position: absolute;
+}
+#hangman-eye-left, #hangman-eye-right {
+    width: 4px; height: 4px; border-radius: 50%;
+    top: 55px;
+}
+#hangman-eye-left { left: 150px; }
+#hangman-eye-right { left: 165px; }
+
+#hangman-mouth {
+    width: 15px; height: 8px;
+    border: 2px solid white;
+    border-top: none;
+    border-radius: 0 0 15px 15px;
+    top: 65px; left: 152px;
+    transform: rotate(180deg);
+    background: transparent !important;
+}
+
+#hangman-ear-left, #hangman-ear-right {
+    width: 6px; height: 10px;
+    border: 2px solid #334155;
+    border-radius: 50%;
+    top: 55px;
+    background: transparent !important;
+}
+#hangman-ear-left { left: 135px; }
+#hangman-ear-right { left: 178px; }
+
+#hangman-hair {
+    width: 20px; height: 10px;
+    border-top: 4px solid #334155;
+    border-radius: 10px 10px 0 0;
+    top: 35px; left: 150px;
+    background: transparent !important;
+}
+
+.word-input-wrapper {
+    position: relative;
+}
+#toggle-password {
+    position: absolute;
+    top: 50%;
+    left: 12px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: #9ca3af;
+}
+
+
+/* Wiggle Animation */
+.wiggle { animation: wiggle 1.2s ease-in-out infinite; }
+#hangman-head.wiggle { transform-origin: center 80%; }
+#hangman-body.wiggle { transform-origin: top center; }
+.wiggle { transform-origin: top center; }
+
+@keyframes wiggle {
+    0%, 100% { transform: rotate(3deg); }
+    50% { transform: rotate(-3deg); }
+}
+
+/* Fall Animation */
+@keyframes fall {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(200px) rotate(90deg); opacity: 0; }
+}
+#hangman-figure.falling { animation: fall 1.2s ease-in forwards; }
+
+/* Mobile & Landscape Specific Adjustments */
+@media (max-height: 500px) and (orientation: landscape) {
+    #setup-page {
+        justify-content: flex-start;
+        overflow-y: auto;
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+    }
+
+    #game-page {
+        flex-direction: row;
+        align-items: stretch;
+        gap: 0.5rem;
+        padding: 0.5rem;
+        padding-top: 4.5rem;
+        box-sizing: border-box;
+    }
+    #game-page > main {
+        width: 50%;
+        flex-shrink: 0;
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        justify-content: center;
+    }
+    #game-page > footer {
+        width: 50%;
+        flex-shrink: 0;
+        height: 100%;
+        display: flex;
+        align-items: center;
+    }
+    #game-page header {
+        position: absolute;
+        top: 0.5rem;
+        left: 0.5rem;
+        right: 0.5rem;
+        width: calc(100% - 1rem);
+        padding: 0.25rem;
+        z-index: 10;
+    }
+    #hangman-container {
+        transform: scale(0.65);
+        margin: -2.5rem 0;
+    }
+    #word-display {
+        transform: scale(0.8);
+        margin: -1.5rem 0;
+    }
+    #keyboard {
+        grid-template-columns: repeat(6, 1fr);
+        gap: 0.25rem;
+        padding: 0.5rem;
+        width: 100%;
+    }
+    .keyboard-btn {
+        padding: 0.4rem;
+        font-size: 0.9rem;
+        min-height: 35px;
+    }
+}
