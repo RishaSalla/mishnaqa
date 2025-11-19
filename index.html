@@ -21,16 +21,16 @@
     <!-- Landing Page -->
     <div id="landing-page" class="page active flex-col items-center justify-center w-full max-w-lg mx-auto bg-[--card] p-6 sm:p-8 rounded-2xl shadow-xl">
       
-      <!-- UPDATED: Logo Image -->
+      <!-- Logo image for landing page (Large) -->
       <div class="logo-container mb-6">
-        <img src="Hang-logo.png" alt="Hangman Logo" class="app-logo mx-auto">
+        <img src="Hang-logo.png" alt="Hangman Logo" class="landing-logo mx-auto">
       </div>
 
       <p class="text-lg sm:text-xl text-slate-600 mb-12 font-medium">اختر طريقة اللعب!</p>
       
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
-        <button data-mode="players" class="mode-btn btn btn-primary p-4 rounded-xl text-xl font-bold">اللعب الجماعي</button>
-        <button data-mode="teams" class="mode-btn btn btn-primary p-4 rounded-xl text-xl font-bold">وضع التحدي</button>
+        <button data-mode="players" class="mode-btn btn btn-primary p-4 rounded-xl text-xl font-bold">🙋‍♂️ اللعب الجماعي</button>
+        <button data-mode="teams" class="mode-btn btn btn-primary p-4 rounded-xl text-xl font-bold">🤝 وضع التحدي</button>
       </div>
       
       <div class="flex items-center justify-center gap-4 mt-8">
@@ -69,7 +69,13 @@
     <div id="game-page" class="page flex-col items-center justify-between w-full h-full py-2 sm:py-4">
         <header id="game-header" class="w-full max-w-4xl mx-auto flex justify-between items-center p-2 rounded-xl bg-[--card] shadow-xl text-xs sm:text-base">
             <button id="game-home-btn" class="btn bg-slate-200 text-slate-700 px-3 py-2 sm:px-4 sm:py-2 rounded-lg font-bold">🏠</button>
-            <div id="game-status" class="flex flex-wrap justify-center items-center gap-2 sm:gap-4 font-bold"></div>
+            
+            <!-- Logo and Status in a central container -->
+            <div class="flex items-center justify-center flex-grow">
+                <img src="Hang-logo.png" alt="Hangman Logo" id="game-logo">
+                <div id="game-status" class="flex flex-wrap justify-center items-center gap-2 sm:gap-4 font-bold"></div>
+            </div>
+
             <div id="power-ups" class="flex items-center gap-2">
               <button id="hint-btn" class="btn bg-blue-100 text-blue-600 px-3 py-2 sm:px-4 sm:py-2 rounded-lg font-bold" title="عرض التلميح">💡</button>
             </div>
@@ -112,8 +118,8 @@
   <dialog id="how-to-play-modal">
     <div>
       <h3 class="text-2xl font-bold mb-4">📖 كيف ألعب؟</h3>
-      <p class="mb-2"><strong>اللعب الجماعي:</strong> أدخل أسماء اللاعبين. اللاعب الأول يضع كلمة والآخرون يخمنونها.</p>
-      <p class="mb-4"><strong>وضع التحدي:</strong> فريق ضد فريق! الفريق الفائز بالجولة يحصل على نقطة.</p>
+      <p class="mb-2"><strong>🙋‍♂️ اللعب الجماعي:</strong> أدخل أسماء اللاعبين. اللاعب الأول يضع كلمة والآخرون يخمنونها.</p>
+      <p class="mb-4"><strong>🤝 وضع التحدي:</strong> فريق ضد فريق! الفريق الفائز بالجولة يحصل على نقطة.</p>
       <div class="text-center mt-6"><button id="close-how-to-play-btn" class="btn btn-primary px-6 py-2 rounded-full">فهمت!</button></div>
     </div>
   </dialog>
