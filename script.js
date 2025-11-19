@@ -346,7 +346,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const isRevealed = gameState.guessedLetters.has(normalizedChar);
 
-            return `<div class="word-letter ${isRevealed ? 'revealed' : ''} w-8 h-12 sm:w-12 sm:h-20 perspective-[500px]"><div class="relative w-full h-full flex items-center justify-center text-2xl sm:text-4xl font-bold border-b-4 border-slate-400 rounded-lg backface-hidden">${isRevealed ? char : ''}</div></div>`;
+            return `<div class="word-letter ${isRevealed ? 'revealed' : ''} w-8 h-12 sm:w-12 sm:h-20 perspective-[500px]"><div class="relative w-full h-full letter-inner"><div class="absolute w-full h-full flex items-center justify-center text-2xl sm:text-4xl font-bold border-b-4 border-slate-400 rounded-lg backface-hidden">${isRevealed ? char : ''}</div></div></div>`;
         }).join('');
     }
 
