@@ -45,25 +45,24 @@ body {
     color: var(--text);
     transition: background-color 0.5s ease;
     overflow: hidden;
-    /* Removed text-center and min-h-screen from body, handled by #app */
 }
 
 #app {
     position: relative;
     z-index: 1;
     height: 100%;
-    text-align: center; /* Ensures content inside is centered */
-    display: flex; /* Ensure it's a flex container */
-    flex-direction: column; /* Stack children vertically */
-    align-items: center; /* Center children horizontally */
-    justify-content: center; /* Center children vertically */
-    min-height: 100vh; /* Ensure it takes full viewport height */
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
     width: 100%;
-    padding: 2px; /* Small default padding */
+    padding: 2px;
 }
-@media (min-width: 640px) { /* Small screens and up */
+@media (min-width: 640px) {
     #app {
-        padding: 1rem; /* Adjust padding for larger screens */
+        padding: 1rem;
     }
 }
 
@@ -71,28 +70,34 @@ body {
 /* -------------------------------------- */
 /* LOGO STYLING */
 /* -------------------------------------- */
-/* Main Logo on Landing Page */
+/* Main Logo on Landing & Setup Pages */
 .app-logo {
-    max-width: 250px; /* Reduced max-width for better fit on all screens */
+    max-width: 250px; 
     height: auto;
     object-fit: contain;
     filter: drop-shadow(0 6px 8px rgba(0,0,0,0.15));
-    transition: max-width 0.3s ease-in-out; /* Smooth transition on resize */
+    transition: max-width 0.3s ease-in-out;
 }
-@media (max-width: 640px) { /* Smaller screens */
+@media (max-width: 640px) { 
     .app-logo {
-        max-width: 180px; /* Even smaller on mobile */
+        max-width: 180px;
     }
 }
-@media (max-height: 700px) and (orientation: portrait) { /* Tall portrait modes */
+@media (max-height: 700px) and (orientation: portrait) {
     .app-logo {
         max-height: 100px;
         max-width: 150px;
     }
 }
 
-
-/* Removed #game-logo styles */
+/* Small Logo in Game Header */
+.game-header-logo {
+    height: 28px; /* Slightly smaller for the header */
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));
+    margin-left: 0.5rem; /* Space from the hint button */
+}
 
 
 #background-effects {
@@ -255,7 +260,6 @@ dialog > div { padding: 1.5rem; }
     border-top: none;
     border-radius: 0 0 15px 15px;
     top: 65px; left: 152px;
-    transform: rotate(180deg);
     background: transparent !important;
 }
 
