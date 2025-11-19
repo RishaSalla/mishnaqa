@@ -15,7 +15,9 @@
     --success: #3D8B40; /* Slightly desaturated green */
     --error: #D9534F;   /* Slightly desaturated red */
     --line: #D0D0D0;    /* Card dividing lines */
-    --card: #FFFFFF;    /* Inner Card Backgrounds */
+    
+    /* UPDATED: Card background is now a soft cream */
+    --card: #fcf9f1;    
     
     --shadow-light: 0 4px 15px rgba(0,0,0,0.08);
     --shadow-medium: 0 8px 25px rgba(0,0,0,0.1);
@@ -29,9 +31,9 @@ html, body {
 body {
     font-family: 'Noto Kufi Arabic', sans-serif;
     /* New Earthy Background Gradient (User Request) */
-    background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
     --bg-start: #e9dfc7; /* User requested base color */
     --bg-end: #dcd0b1;   /* Matching darker end for gradient */
+    background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
     
     color: var(--text);
     transition: background-color 0.5s ease;
