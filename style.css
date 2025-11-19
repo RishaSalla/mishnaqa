@@ -1,3 +1,10 @@
+html {
+    box-sizing: border-box; /* Crucial for consistent layout */
+}
+*, *::before, *::after {
+    box-sizing: inherit;
+}
+
 :root {
     /* -------------------------------------- */
     /* COLOR PALETTE - VINTAGE OLIVE GREEN THEME */
@@ -38,36 +45,55 @@ body {
     color: var(--text);
     transition: background-color 0.5s ease;
     overflow: hidden;
+    /* Removed text-center and min-h-screen from body, handled by #app */
 }
 
 #app {
     position: relative;
     z-index: 1;
     height: 100%;
+    text-align: center; /* Ensures content inside is centered */
+    display: flex; /* Ensure it's a flex container */
+    flex-direction: column; /* Stack children vertically */
+    align-items: center; /* Center children horizontally */
+    justify-content: center; /* Center children vertically */
+    min-height: 100vh; /* Ensure it takes full viewport height */
+    width: 100%;
+    padding: 2px; /* Small default padding */
 }
+@media (min-width: 640px) { /* Small screens and up */
+    #app {
+        padding: 1rem; /* Adjust padding for larger screens */
+    }
+}
+
 
 /* -------------------------------------- */
 /* LOGO STYLING */
 /* -------------------------------------- */
-/* Large Logo on Landing Page */
-.landing-logo {
-    max-width: 80%;
+/* Main Logo on Landing Page */
+.app-logo {
+    max-width: 250px; /* Reduced max-width for better fit on all screens */
     height: auto;
-    max-height: 150px;
-    display: block;
     object-fit: contain;
     filter: drop-shadow(0 6px 8px rgba(0,0,0,0.15));
+    transition: max-width 0.3s ease-in-out; /* Smooth transition on resize */
+}
+@media (max-width: 640px) { /* Smaller screens */
+    .app-logo {
+        max-width: 180px; /* Even smaller on mobile */
+    }
+}
+@media (max-height: 700px) and (orientation: portrait) { /* Tall portrait modes */
+    .app-logo {
+        max-height: 100px;
+        max-width: 150px;
+    }
 }
 
-/* Small Logo in Game Header */
-#game-logo {
-    height: 32px; 
-    width: auto;
-    object-fit: contain;
-    margin-left: 0.5rem; /* Space between logo and status text */
-    margin-right: 0.5rem;
-    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));
-}
+
+/* Removed #game-logo styles */
+
 
 #background-effects {
     position: fixed;
@@ -94,7 +120,7 @@ body {
     100% { transform: translateY(-105vh) rotate(360deg); opacity: 0; }
 }
 
-.page { display: none; height: 100%; }
+.page { display: none; height: 100%; width: 100%; flex-shrink: 0; }
 .page.active { display: flex; }
 
 .btn {
