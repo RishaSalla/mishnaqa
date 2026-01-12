@@ -9,9 +9,104 @@ document.addEventListener('DOMContentLoaded', () => {
         game: $('#game-page'),
     };
 
-    const gameState = {};
+    const gameState = {
+        config: null
+    };
 
-    // Arabic Letters configuration
+    // --- LOGIC: SECURITY & CONFIG ---
+    async function loadConfig() {
+        try {
+            const response = await fetch('config.json');
+            if (!response.ok) throw new Error("Config not found");
+            gameState.config = await response.json();
+            console.log("Config loaded successfully.");
+        } catch (e) {
+            console.error("Failed to load config", e);
+            $('#login-error').innerText = "خطأ في الاتصال بالخادم";
+        }
+    }
+
+    async function hashString(message) {
+        const msgBuffer = new TextEncoder().encode(message);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        return hashHex;
+    }
+
+    async function handleLogin() {
+        const input = $('#access-code-input').value.trim();
+        const errorEl = $('#login-error');
+        const btn = $('#login-btn');
+
+        if (!input) {
+            errorEl.innerText = "الرجاء إدخال الكود";
+            return;
+        }
+
+        if (!gameState.config) {
+            await loadConfig();
+            if (!gameState.config) return;
+        }
+
+        btn.disabled = true;
+        btn.innerText = "جاري التحقق...";
+
+        const hashedInput = await hashString(input);
+        
+        // التحقق من المصفوفة في ملف الكونفج
+        if (gameState.config.valid_hashes.includes(hashedInput)) {
+            // Success
+            $('#login-overlay').style.opacity = '0';
+            setTimeout(() => {
+                $('#login-overlay').classList.add('hidden');
+                $('#app').classList.remove('hidden');
+                // مهلة بسيطة لعمل الانيميشن ثم اظهار التطبيق
+                setTimeout(() => {
+                     $('#app').classList.remove('opacity-0');
+                     resizeBoard(); // Ensure size is correct
+                }, 100);
+            }, 500);
+        } else {
+            // Fail
+            errorEl.innerText = "كود غير صحيح";
+            btn.disabled = false;
+            btn.innerText = "دخول 🔓";
+            $('#access-code-input').value = '';
+            $('#access-code-input').focus();
+        }
+    }
+
+    // --- LOGIC: RESPONSIVE SCALER ---
+    function resizeBoard() {
+        const scaler = $('#game-scaler');
+        const app = $('#app');
+        if (!scaler || !app) return;
+
+        // الأبعاد الأصلية التي صممت اللعبة عليها
+        const baseWidth = 450; 
+        const baseHeight = 800; 
+
+        // أبعاد الشاشة الحالية
+        const availableWidth = window.innerWidth;
+        const availableHeight = window.innerHeight;
+
+        // حساب نسبة التكبير/التصغير
+        const scaleX = availableWidth / baseWidth;
+        const scaleY = availableHeight / baseHeight;
+        
+        // نختار النسبة الأصغر لضمان ظهور اللعبة بالكامل
+        // ونضع حداً أقصى للتكبير (مثلاً 1.2) حتى لا تصبح ضخمة جداً على الشاشات الكبيرة
+        const scale = Math.min(scaleX, scaleY, 1.2); 
+
+        // تطبيق التحويل
+        scaler.style.transform = `scale(${scale})`;
+        
+        // توسيط العنصر اذا كانت الشاشة أكبر
+        // (يتم التعامل معه تلقائياً بواسطة Flexbox في الـ CSS الخاص بـ #app)
+    }
+
+    // --- EXISTING GAME LOGIC ---
     const ARABIC_LETTERS = ['ا', 'ب', 'ت', 'ث', 'ج', 'ح', 'خ', 'د', 'ذ', 'ر', 'ز', 'س', 'ش', 'ص', 'ض', 'ط', 'ظ', 'ع', 'غ', 'ف', 'ق', 'ك', 'ل', 'م', 'ن', 'ه', 'و', 'ي', 'ء'];
     
     const WORD_BANK = {
@@ -26,6 +121,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function showPage(pageId) {
         Object.values(pages).forEach(p => p.classList.remove('active'));
         pages[pageId].classList.add('active');
+        // Recalculate layout after page switch mainly for keyboard/hangman alignment
+        setTimeout(resizeBoard, 50); 
     }
 
     function showAlert(message, title = 'تنبيه!') {
@@ -51,9 +148,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function init() {
-        showPage('landing');
+        // Load Config Immediately
+        loadConfig();
+        
+        // Listeners for Login
+        $('#login-btn').addEventListener('click', handleLogin);
+        $('#access-code-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleLogin();
+        });
+
+        // Resize Listener
+        window.addEventListener('resize', resizeBoard);
+        
+        // Initial Effect
         createBackgroundEffects();
 
+        // Standard Game Listeners
         $$('.mode-btn').forEach(btn => btn.addEventListener('click', (e) => selectMode(e.target.dataset.mode)));
         $('#start-game-btn').addEventListener('click', startGame);
         $('#confirm-word-btn').addEventListener('click', handleWordConfirmation);
@@ -72,7 +182,6 @@ document.addEventListener('DOMContentLoaded', () => {
         $('#close-hint-btn').addEventListener('click', () => $('#hint-modal').close());
         $('#suggest-word-btn').addEventListener('click', showWordSuggestions);
         $('#close-suggestion-btn').addEventListener('click', () => $('#word-suggestion-modal').close());
-
         $('#close-alert-btn').addEventListener('click', () => $('#alert-modal').close());
 
         const passwordInput = $('#secret-word-input');
@@ -114,53 +223,18 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="text-center mt-6">
               <label class="font-semibold block mb-2">مستوى الصعوبة:</label>
               <div class="flex justify-center gap-2">
-                <div>
-                    <button data-difficulty="12" class="difficulty-btn btn bg-green-200 text-green-800 px-4 py-2 rounded-full font-bold">سهل</button>
-                    <span class="text-xs text-slate-500 block mt-1">12 خطأ</span>
-                </div>
-                <div>
-                    <button data-difficulty="8" class="difficulty-btn btn bg-amber-200 text-amber-800 px-4 py-2 rounded-full font-bold active">متوسط</button>
-                    <span class="text-xs text-slate-500 block mt-1">8 أخطاء</span>
-                </div>
-                <div>
-                    <button data-difficulty="4" class="difficulty-btn btn bg-red-200 text-red-800 px-4 py-2 rounded-full font-bold">صعب</button>
-                    <span class="text-xs text-slate-500 block mt-1">4 أخطاء</span>
-                </div>
+                <div><button data-difficulty="12" class="difficulty-btn btn bg-green-200 text-green-800 px-4 py-2 rounded-full font-bold">سهل</button><span class="text-xs text-slate-500 block mt-1">12 خطأ</span></div>
+                <div><button data-difficulty="8" class="difficulty-btn btn bg-amber-200 text-amber-800 px-4 py-2 rounded-full font-bold active">متوسط</button><span class="text-xs text-slate-500 block mt-1">8 أخطاء</span></div>
+                <div><button data-difficulty="4" class="difficulty-btn btn bg-red-200 text-red-800 px-4 py-2 rounded-full font-bold">صعب</button><span class="text-xs text-slate-500 block mt-1">4 أخطاء</span></div>
               </div>
           </div>`;
 
         if (mode === 'players') {
             setupTitle.innerText = "🙋‍♂️ إعداد اللاعبين";
-            contentHTML = `
-                <div>
-                    <h3 class="font-bold text-xl mb-2 text-center">أسماء اللاعبين</h3>
-                    <div class="flex gap-2">
-                        <input type="text" id="player-input" class="w-full p-2 border rounded" placeholder="أضف لاعب واضغط Enter...">
-                        <button id="add-player-btn" class="btn btn-primary px-4 rounded-lg font-bold">+</button>
-                    </div>
-                    <ul id="player-list" class="mt-4 grid grid-cols-2 md:grid-cols-3 gap-2"></ul>
-                </div>
-                ${difficultySelector}`;
+            contentHTML = `<div><h3 class="font-bold text-xl mb-2 text-center">أسماء اللاعبين</h3><div class="flex gap-2"><input type="text" id="player-input" class="w-full p-2 border rounded" placeholder="أضف لاعب واضغط Enter..."><button id="add-player-btn" class="btn btn-primary px-4 rounded-lg font-bold">+</button></div><ul id="player-list" class="mt-4 grid grid-cols-2 md:grid-cols-3 gap-2"></ul></div>${difficultySelector}`;
         } else if (mode === 'teams') {
             setupTitle.innerText = "🤝 إعداد الفرق";
-            contentHTML = `
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <input type="text" id="team-a-name" class="w-full p-2 border rounded text-center font-bold text-xl text-[--primary] mb-2" value="الأبطال">
-                  <div class="flex gap-2"><input type="text" id="team-a-input" class="w-full p-2 border rounded" placeholder="أضف لاعب..."><button id="add-team-a-btn" class="btn btn-primary px-4 rounded-lg font-bold">+</button></div>
-                  <ul id="team-a-list" class="mt-2 space-y-1"></ul>
-                </div>
-                <div>
-                  <input type="text" id="team-b-name" class="w-full p-2 border rounded text-center font-bold text-xl text-blue-500 mb-2" value="النجوم">
-                  <div class="flex gap-2"><input type="text" id="team-b-input" class="w-full p-2 border rounded" placeholder="أضف لاعب..."><button id="add-team-b-btn" class="btn btn-primary px-4 rounded-lg font-bold">+</button></div>
-                  <ul id="team-b-list" class="mt-2 space-y-1"></ul>
-                </div>
-              </div>
-              <div class="text-center mt-4">
-                  <label class="font-semibold">الهدف للوصول إليه: </label>
-                  <input type="number" id="target-score-input" value="5" min="1" class="w-20 p-1 border rounded text-center">
-              </div>
-              ${difficultySelector}`;
+            contentHTML = `<div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div><input type="text" id="team-a-name" class="w-full p-2 border rounded text-center font-bold text-xl text-[--primary] mb-2" value="الأبطال"><div class="flex gap-2"><input type="text" id="team-a-input" class="w-full p-2 border rounded" placeholder="أضف لاعب..."><button id="add-team-a-btn" class="btn btn-primary px-4 rounded-lg font-bold">+</button></div><ul id="team-a-list" class="mt-2 space-y-1"></ul></div><div><input type="text" id="team-b-name" class="w-full p-2 border rounded text-center font-bold text-xl text-blue-500 mb-2" value="النجوم"><div class="flex gap-2"><input type="text" id="team-b-input" class="w-full p-2 border rounded" placeholder="أضف لاعب..."><button id="add-team-b-btn" class="btn btn-primary px-4 rounded-lg font-bold">+</button></div><ul id="team-b-list" class="mt-2 space-y-1"></ul></div></div><div class="text-center mt-4"><label class="font-semibold">الهدف للوصول إليه: </label><input type="number" id="target-score-input" value="5" min="1" class="w-20 p-1 border rounded text-center"></div>${difficultySelector}`;
         }
         setupContent.innerHTML = contentHTML;
 
@@ -199,12 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderPlayerList() {
         const list = $('#player-list');
         if (!list) return;
-        list.innerHTML = gameState.players.map((p, index) => `
-            <li class="bg-slate-100 p-2 rounded text-center flex justify-between items-center">
-              <span>${p}</span>
-              <button data-index="${index}" class="remove-player-btn text-red-500 font-bold px-2">&times;</button>
-            </li>`
-        ).join('');
+        list.innerHTML = gameState.players.map((p, index) => `<li class="bg-slate-100 p-2 rounded text-center flex justify-between items-center"><span>${p}</span><button data-index="${index}" class="remove-player-btn text-red-500 font-bold px-2">&times;</button></li>`).join('');
         $$('.remove-player-btn').forEach(btn => btn.addEventListener('click', (e) => {
             gameState.players.splice(parseInt(e.target.dataset.index), 1);
             renderPlayerList();
@@ -275,20 +344,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const word = $('#secret-word-input').value.trim();
         const hint = $('#secret-word-hint').value.trim();
         const errorEl = $('#word-entry-error');
-        if (!word) {
-            errorEl.innerText = 'الرجاء إدخال كلمة.'; return;
-        }
+        if (!word) { errorEl.innerText = 'الرجاء إدخال كلمة.'; return; }
         if (!/^[ءآأؤإئابةتثجحخدذرزسشصضطظعغفقكلمنهوىي\s]+$/.test(word)) {
             errorEl.innerText = 'الرجاء استخدام حروف عربية فقط.'; return;
         }
         gameState.originalWord = word;
-
-        // Logic: Normalize characters
         gameState.word = word.toLowerCase()
-            .replace(/[أإآ]/g, 'ا')
-            .replace(/ة/g, 'ه')
-            .replace(/ى/g, 'ي')
-            .replace(/[ؤئ]/g, 'ء');
+            .replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه')
+            .replace(/ى/g, 'ي').replace(/[ؤئ]/g, 'ء');
 
         gameState.hint = hint;
         startRound();
@@ -301,17 +364,14 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let i = 0; i < 3; i++) {
             const randomCategory = categories[Math.floor(Math.random() * categories.length)];
             const randomWord = WORD_BANK[randomCategory][Math.floor(Math.random() * WORD_BANK[randomCategory].length)];
-
             const suggestionButton = document.createElement('button');
             suggestionButton.className = "w-full text-right p-2 rounded bg-slate-100 hover:bg-slate-200 transition";
             suggestionButton.innerHTML = `<strong>${randomCategory}:</strong> ${randomWord}`;
-
             suggestionButton.onclick = () => {
                 $('#secret-word-input').value = randomWord;
                 $('#secret-word-hint').value = '';
                 $('#word-suggestion-modal').close();
             };
-
             list.appendChild(suggestionButton);
         }
         $('#word-suggestion-modal').showModal();
@@ -337,15 +397,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const wordDisplay = $('#word-display');
         wordDisplay.innerHTML = gameState.originalWord.split('').map(char => {
             if (char === ' ') return `<div class="w-8 h-12 sm:w-10 sm:h-16"></div>`;
-
-            let normalizedChar = char.toLowerCase()
-                .replace(/[أإآ]/g, 'ا')
-                .replace(/ة/g, 'ه')
-                .replace(/ى/g, 'ي')
-                .replace(/[ؤئ]/g, 'ء');
-
+            let normalizedChar = char.toLowerCase().replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').replace(/[ؤئ]/g, 'ء');
             const isRevealed = gameState.guessedLetters.has(normalizedChar);
-
             return `<div class="word-letter ${isRevealed ? 'revealed' : ''} w-8 h-12 sm:w-12 sm:h-20 perspective-[500px]"><div class="relative w-full h-full letter-inner"><div class="absolute w-full h-full flex items-center justify-center text-2xl sm:text-4xl font-bold border-b-4 border-slate-400 rounded-lg backface-hidden">${isRevealed ? char : ''}</div></div></div>`;
         }).join('');
     }
@@ -380,21 +433,12 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         Object.values(allPossibleParts).forEach(selector => $(selector)?.classList.add('hidden'));
-
         const currentSequence = sequences[gameState.maxMistakes] || sequences[8];
         const partsToShow = [];
-
         for (let i = 0; i < gameState.wrongGuesses; i++) {
-            if (currentSequence[i]) {
-                partsToShow.push(...currentSequence[i]);
-            }
+            if (currentSequence[i]) partsToShow.push(...currentSequence[i]);
         }
-
-        partsToShow.forEach(partKey => {
-            if (allPossibleParts[partKey]) {
-                $(allPossibleParts[partKey])?.classList.remove('hidden');
-            }
-        });
+        partsToShow.forEach(partKey => { if (allPossibleParts[partKey]) $(allPossibleParts[partKey])?.classList.remove('hidden'); });
 
         const isLosing = gameState.wrongGuesses >= gameState.maxMistakes;
         $$('.hangman-part, .hangman-face-part').forEach(el => {
@@ -409,16 +453,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (gameState.mode === 'players') {
             const wordMaster = gameState.players[gameState.playerIndex];
             html = `<div class="text-center w-full"><div class="font-bold text-sm sm:text-base">الكلمة من: ${wordMaster}</div><div class="text-xs sm:text-sm">الأخطاء: ${gameState.wrongGuesses} / ${gameState.maxMistakes}</div></div>`;
-        } else { // teams
+        } else {
             const teamAName = gameState.teamNames.teamA;
             const teamBName = gameState.teamNames.teamB;
             const guessingTeamKey = gameState.currentTeam === 'teamA' ? 'teamB' : 'teamA';
             const guessingTeamName = gameState.teamNames[guessingTeamKey];
-
-            html = `<span class="text-[--primary] font-extrabold text-sm sm:text-base">${teamAName}: ${gameState.scores['teamA']}</span> 
-                    <span class="mx-0.5 sm:mx-1 text-slate-400">|</span> 
-                    <span class="text-blue-500 font-extrabold text-sm sm:text-base">${teamBName}: ${gameState.scores['teamB']}</span>
-                    <span class="w-full text-xs sm:text-sm mt-1">التخمين: فريق ${guessingTeamName}</span>`;
+            html = `<span class="text-[--primary] font-extrabold text-sm sm:text-base">${teamAName}: ${gameState.scores['teamA']}</span><span class="mx-0.5 sm:mx-1 text-slate-400">|</span><span class="text-blue-500 font-extrabold text-sm sm:text-base">${teamBName}: ${gameState.scores['teamB']}</span><span class="w-full text-xs sm:text-sm mt-1">التخمين: فريق ${guessingTeamName}</span>`;
         }
         status.innerHTML = html;
     }
@@ -426,13 +466,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleGuess(letter) {
         if (gameState.guessedLetters.has(letter)) return;
         gameState.guessedLetters.add(letter);
-
-        const isCorrect = gameState.word.includes(letter);
-
-        if (!isCorrect) {
-            gameState.wrongGuesses++;
-        }
-
+        if (!gameState.word.includes(letter)) gameState.wrongGuesses++;
         renderGameUI();
         checkGameState();
     }
@@ -442,12 +476,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (char === ' ') return true;
             return gameState.guessedLetters.has(char);
         });
-
         const roundLost = gameState.wrongGuesses >= gameState.maxMistakes;
-
-        if (wordGuessed) {
-            setTimeout(() => handleRoundEnd(true), 500);
-        } else if (roundLost) {
+        if (wordGuessed) setTimeout(() => handleRoundEnd(true), 500);
+        else if (roundLost) {
             $('#hangman-figure').classList.add('falling');
             setTimeout(() => handleRoundEnd(false), 1200);
         }
@@ -463,37 +494,26 @@ document.addEventListener('DOMContentLoaded', () => {
             const message = isWin ? "أحسنتم! خمنتم الكلمة بنجاح!" : "للأسف! حظ أوفر في المرة القادمة.";
             endGame(isWin, message, "الدور التالي");
             nextActionBtn.onclick = () => { $('#game-over-modal').close(); prepareNextRound(); };
-        } else { // teams
+        } else {
             const guessingTeamKey = gameState.currentTeam === 'teamA' ? 'teamB' : 'teamA';
             const wordMasterTeamKey = gameState.currentTeam;
-
-            if (isWin) {
-                gameState.scores[guessingTeamKey]++;
-            } else {
-                gameState.scores[wordMasterTeamKey]++;
-            }
-
+            if (isWin) gameState.scores[guessingTeamKey]++; else gameState.scores[wordMasterTeamKey]++;
+            
             const teamAName = gameState.teamNames.teamA;
             const teamBName = gameState.teamNames.teamB;
             finalScoreDisplay.innerHTML = `<span class="text-[--primary] font-bold">${teamAName}: ${gameState.scores['teamA']}</span> - <span class="text-blue-500 font-bold">${teamBName}: ${gameState.scores['teamB']}</span>`;
 
             const winnerKey = Object.keys(gameState.scores).find(teamKey => gameState.scores[teamKey] >= gameState.targetScore);
-
             if (winnerKey) {
                 const winnerName = gameState.teamNames[winnerKey];
-                const message = `🏆 فريق ${winnerName} يفوز بالمباراة!`;
-                endGame(true, message, "مباراة جديدة");
+                endGame(true, `🏆 فريق ${winnerName} يفوز بالمباراة!`, "مباراة جديدة");
                 nextActionBtn.onclick = () => { $('#game-over-modal').close(); showPage('landing'); };
             } else {
                 const guessingTeamName = gameState.teamNames[guessingTeamKey];
                 const wordMasterTeamName = gameState.teamNames[wordMasterTeamKey];
                 const message = isWin ? `نقطة لفريق ${guessingTeamName}!` : `نقطة لفريق ${wordMasterTeamName}!`;
-
-                if (gameState.currentTeam === 'teamA') {
-                    gameState.teamAPlayerIndex = (gameState.teamAPlayerIndex + 1) % gameState.teams['teamA'].length;
-                } else {
-                    gameState.teamBPlayerIndex = (gameState.teamBPlayerIndex + 1) % gameState.teams['teamB'].length;
-                }
+                if (gameState.currentTeam === 'teamA') gameState.teamAPlayerIndex = (gameState.teamAPlayerIndex + 1) % gameState.teams['teamA'].length;
+                else gameState.teamBPlayerIndex = (gameState.teamBPlayerIndex + 1) % gameState.teams['teamB'].length;
                 gameState.currentTeam = guessingTeamKey;
                 endGame(isWin, message, "الجولة التالية");
                 nextActionBtn.onclick = () => { $('#game-over-modal').close(); prepareNextRound(); };
