@@ -1,76 +1,65 @@
 html {
-    box-sizing: border-box; /* Crucial for consistent layout */
+    box-sizing: border-box;
+    height: 100%;
 }
 *, *::before, *::after {
     box-sizing: inherit;
 }
 
 :root {
-    /* -------------------------------------- */
-    /* COLOR PALETTE - VINTAGE OLIVE GREEN THEME */
-    /* -------------------------------------- */
     --bg: #F8F9FA; 
     --text: #1F2937; 
-    
-    /* Primary color: Deep Olive Green (User Request) */
     --primary: #54693b;       
-    
-    /* Darker shade for hover effects and borders */
     --primary-dark: #44542f;  
-    
-    /* Status Colors adjusted for contrast */
     --success: #3D8B40; 
     --error: #D9534F;   
     --line: #D0D0D0;    
-    
-    /* Card background is a soft cream */
     --card: #fcf9f1;    
-    
     --shadow-light: 0 4px 15px rgba(0,0,0,0.08);
     --shadow-medium: 0 8px 25px rgba(0,0,0,0.1);
 }
 
-html, body {
-    height: 100%;
-    overscroll-behavior: none;
-}
-
 body {
     font-family: 'Noto Kufi Arabic', sans-serif;
-    /* Earthy Background Gradient */
     --bg-start: #e9dfc7; 
     --bg-end: #dcd0b1;   
     background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
-    
     color: var(--text);
     transition: background-color 0.5s ease;
-    overflow: hidden;
+    
+    /* PRODUCTION GRADE MOBILE FIXES */
+    height: 100dvh; /* Dynamic Viewport Height */
+    width: 100vw;
+    overflow: hidden; /* Prevent scrolling, handle by scaler */
+    
+    /* Safe Area Insets for Notch/Home Bar */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
 }
 
 #app {
     position: relative;
     z-index: 1;
     height: 100%;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
+    width: 100%;
+    display: flex; /* Changed for scaler alignment */
     align-items: center;
     justify-content: center;
-    min-height: 100vh;
-    width: 100%;
-    padding: 2px;
-}
-@media (min-width: 640px) {
-    #app {
-        padding: 1rem;
-    }
 }
 
+#game-scaler {
+    /* This element is scaled via JS */
+    transform-origin: center center;
+    width: 100%;
+    padding: 1rem;
+    transition: transform 0.2s ease-out; /* Smooth resizing */
+}
 
 /* -------------------------------------- */
 /* LOGO STYLING */
 /* -------------------------------------- */
-/* Main Logo on Landing & Setup Pages */
 .app-logo {
     max-width: 250px; 
     height: auto;
@@ -78,54 +67,32 @@ body {
     filter: drop-shadow(0 6px 8px rgba(0,0,0,0.15));
     transition: max-width 0.3s ease-in-out;
 }
-@media (max-width: 640px) { 
-    .app-logo {
-        max-width: 180px;
-    }
-}
-@media (max-height: 700px) and (orientation: portrait) {
-    .app-logo {
-        max-height: 100px;
-        max-width: 150px;
-    }
-}
-
-/* Small Logo in Game Header */
 .game-header-logo {
-    height: 28px; /* Slightly smaller for the header */
+    height: 28px; 
     width: auto;
     object-fit: contain;
     filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));
-    margin-left: 0.5rem; /* Space from the hint button */
+    margin-left: 0.5rem; 
 }
-
 
 #background-effects {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
-    overflow: hidden;
-    pointer-events: none;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 0; overflow: hidden; pointer-events: none;
 }
 
 .floating-letter {
-    position: absolute;
-    bottom: -50px;
-    font-size: 2rem;
+    position: absolute; bottom: -50px; font-size: 2rem;
     color: rgba(84, 105, 59, 0.3);
     animation: floatUp 15s linear infinite;
 }
-
 @keyframes floatUp {
     0% { transform: translateY(0) rotate(0deg); opacity: 0; }
     10%, 90% { opacity: 1; }
     100% { transform: translateY(-105vh) rotate(360deg); opacity: 0; }
 }
 
-.page { display: none; height: 100%; width: 100%; flex-shrink: 0; }
+.page { display: none; width: 100%; flex-direction: column; align-items: center; }
 .page.active { display: flex; }
 
 .btn {
@@ -153,224 +120,87 @@ body {
     20%, 40%, 60%, 80% { transform: translateX(5px); }
 }
 
-.word-letter {
-    transition: all 0.5s ease;
-    transform-style: preserve-3d;
-}
+.word-letter { transition: all 0.5s ease; transform-style: preserve-3d; }
 .word-letter.revealed .letter-inner { transform: rotateX(360deg); }
 .letter-inner { transition: transform 0.6s; position: relative; }
 .letter-inner > div {
-    background-color: var(--card);
-    border: 2px solid var(--line);
-    border-radius: 8px;
-    box-shadow: var(--shadow-light);
+    background-color: var(--card); border: 2px solid var(--line);
+    border-radius: 8px; box-shadow: var(--shadow-light);
 }
 .word-letter.revealed .letter-inner > div {
-    background-color: var(--primary);
-    color: white;
-    border-color: var(--primary-dark);
-    box-shadow: var(--shadow-medium);
+    background-color: var(--primary); color: white;
+    border-color: var(--primary-dark); box-shadow: var(--shadow-medium);
 }
 
 .difficulty-btn.active {
-    box-shadow: 0 0 0 3px var(--primary);
-    transform: translateY(-2px);
+    box-shadow: 0 0 0 3px var(--primary); transform: translateY(-2px);
 }
 
 dialog {
-    border: none;
-    padding: 0;
-    border-radius: 1rem;
-    box-shadow: var(--shadow-medium);
-    background-color: var(--card);
-    max-width: 90%;
-    width: 500px;
+    border: none; padding: 0; border-radius: 1rem;
+    box-shadow: var(--shadow-medium); background-color: var(--card);
+    max-width: 90%; width: 500px;
+    z-index: 100; /* Ensure dialogs are above everything */
 }
 dialog::backdrop { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); }
 dialog > div { padding: 1.5rem; }
-@media (min-width: 640px) {
-    dialog > div { padding: 2rem; }
-}
 
 /* Hangman Styles */
-#hangman-container {
-    width: 200px;
-    height: 250px;
-    transform-origin: center top;
-}
+#hangman-container { width: 200px; height: 250px; transform-origin: center top; }
 .gallows-part { background-color: #475569; position: absolute; border-radius: 3px; }
 .gallows-part.rope {
-    width: 6px; height: 45px;
-    top: 0; left: 160px;
-    border-radius: 6px 6px 0 0;
-    transform: translateX(-50%);
+    width: 6px; height: 45px; top: 0; left: 160px;
+    border-radius: 6px 6px 0 0; transform: translateX(-50%);
 }
 
-#hangman-figure {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    transition: transform 1s ease-in;
-}
+#hangman-figure { position: absolute; width: 100%; height: 100%; transition: transform 1s ease-in; }
 .hangman-part {
-    background-color: #475569;
-    border: 2px solid #334155;
-    position: absolute;
+    background-color: #475569; border: 2px solid #334155; position: absolute;
     transition: transform 0.2s ease-out, opacity 0.2s ease-out;
 }
 
-#hangman-head {
-    width: 40px; height: 40px; border-radius: 50%;
-    top: 40px; left: 140px;
-}
-#hangman-body {
-    width: 5px; height: 60px; border-radius: 3px;
-    top: 80px; left: 158px;
-}
-#hangman-arm-left {
-    width: 5px; height: 40px; border-radius: 3px;
-    top: 90px; left: 150px; transform: rotate(20deg); transform-origin: top center;
-}
-#hangman-arm-right {
-    width: 5px; height: 40px; border-radius: 3px;
-    top: 90px; left: 165px; transform: rotate(-20deg); transform-origin: top center;
-}
-#hangman-leg-left {
-    width: 5px; height: 45px; border-radius: 3px;
-    top: 135px; left: 150px; transform: rotate(20deg); transform-origin: top center;
-}
-#hangman-leg-right {
-    width: 5px; height: 45px; border-radius: 3px;
-    top: 135px; left: 165px; transform: rotate(-20deg); transform-origin: top center;
-}
-.hangman-face-part {
-    background-color: white;
-    position: absolute;
-}
-#hangman-eye-left, #hangman-eye-right {
-    width: 4px; height: 4px; border-radius: 50%;
-    top: 55px;
-}
-#hangman-eye-left { left: 150px; }
-#hangman-eye-right { left: 165px; }
+#hangman-head { width: 40px; height: 40px; border-radius: 50%; top: 40px; left: 140px; }
+#hangman-body { width: 5px; height: 60px; border-radius: 3px; top: 80px; left: 158px; }
+#hangman-arm-left { width: 5px; height: 40px; border-radius: 3px; top: 90px; left: 150px; transform: rotate(20deg); transform-origin: top center; }
+#hangman-arm-right { width: 5px; height: 40px; border-radius: 3px; top: 90px; left: 165px; transform: rotate(-20deg); transform-origin: top center; }
+#hangman-leg-left { width: 5px; height: 45px; border-radius: 3px; top: 135px; left: 150px; transform: rotate(20deg); transform-origin: top center; }
+#hangman-leg-right { width: 5px; height: 45px; border-radius: 3px; top: 135px; left: 165px; transform: rotate(-20deg); transform-origin: top center; }
 
+.hangman-face-part { background-color: white; position: absolute; }
+#hangman-eye-left, #hangman-eye-right { width: 4px; height: 4px; border-radius: 50%; top: 55px; }
+#hangman-eye-left { left: 150px; } #hangman-eye-right { left: 165px; }
 #hangman-mouth {
-    width: 15px; height: 8px;
-    border: 2px solid white;
-    border-top: none;
-    border-radius: 0 0 15px 15px;
-    top: 65px; left: 152px;
-    background: transparent !important;
+    width: 15px; height: 8px; border: 2px solid white; border-top: none;
+    border-radius: 0 0 15px 15px; top: 65px; left: 152px; background: transparent !important;
 }
-
 #hangman-ear-left, #hangman-ear-right {
-    width: 6px; height: 10px;
-    border: 2px solid #334155;
-    border-radius: 50%;
-    top: 55px;
-    background: transparent !important;
+    width: 6px; height: 10px; border: 2px solid #334155; border-radius: 50%;
+    top: 55px; background: transparent !important;
 }
-#hangman-ear-left { left: 135px; }
-#hangman-ear-right { left: 178px; }
-
+#hangman-ear-left { left: 135px; } #hangman-ear-right { left: 178px; }
 #hangman-hair {
-    width: 20px; height: 10px;
-    border-top: 4px solid #334155;
-    border-radius: 10px 10px 0 0;
-    top: 35px; left: 150px;
-    background: transparent !important;
+    width: 20px; height: 10px; border-top: 4px solid #334155; border-radius: 10px 10px 0 0;
+    top: 35px; left: 150px; background: transparent !important;
 }
 
-.word-input-wrapper {
-    position: relative;
-}
+.word-input-wrapper { position: relative; }
 #toggle-password {
-    position: absolute;
-    top: 50%;
-    left: 12px;
-    transform: translateY(-50%);
-    cursor: pointer;
-    font-size: 1.5rem;
-    color: #9ca3af;
+    position: absolute; top: 50%; left: 12px; transform: translateY(-50%);
+    cursor: pointer; font-size: 1.5rem; color: #9ca3af;
 }
 
-
-/* Wiggle Animation */
+/* Animations */
 .wiggle { animation: wiggle 1.2s ease-in-out infinite; }
 #hangman-head.wiggle { transform-origin: center 80%; }
 #hangman-body.wiggle { transform-origin: top center; }
 .wiggle { transform-origin: top center; }
-
 @keyframes wiggle {
-    0%, 100% { transform: rotate(3deg); }
-    50% { transform: rotate(-3deg); }
+    0%, 100% { transform: rotate(3deg); } 50% { transform: rotate(-3deg); }
 }
-
-/* Fall Animation */
 @keyframes fall {
     0% { transform: translateY(0) rotate(0deg); opacity: 1; }
     100% { transform: translateY(200px) rotate(90deg); opacity: 0; }
 }
 #hangman-figure.falling { animation: fall 1.2s ease-in forwards; }
 
-/* Mobile & Landscape Specific Adjustments */
-@media (max-height: 500px) and (orientation: landscape) {
-    #setup-page {
-        justify-content: flex-start;
-        overflow-y: auto;
-        padding-top: 2rem;
-        padding-bottom: 2rem;
-    }
-
-    #game-page {
-        flex-direction: row;
-        align-items: stretch;
-        gap: 0.5rem;
-        padding: 0.5rem;
-        padding-top: 4.5rem;
-        box-sizing: border-box;
-    }
-    #game-page > main {
-        width: 50%;
-        flex-shrink: 0;
-        padding: 0;
-        margin: 0;
-        height: 100%;
-        justify-content: center;
-    }
-    #game-page > footer {
-        width: 50%;
-        flex-shrink: 0;
-        height: 100%;
-        display: flex;
-        align-items: center;
-    }
-    #game-page header {
-        position: absolute;
-        top: 0.5rem;
-        left: 0.5rem;
-        right: 0.5rem;
-        width: calc(100% - 1rem);
-        padding: 0.25rem;
-        z-index: 10;
-    }
-    #hangman-container {
-        transform: scale(0.65);
-        margin: -2.5rem 0;
-    }
-    #word-display {
-        transform: scale(0.8);
-        margin: -1.5rem 0;
-    }
-    #keyboard {
-        grid-template-columns: repeat(6, 1fr);
-        gap: 0.25rem;
-        padding: 0.5rem;
-        width: 100%;
-    }
-    .keyboard-btn {
-        padding: 0.4rem;
-        font-size: 0.9rem;
-        min-height: 35px;
-    }
-}
+.dir-ltr { direction: ltr; }
