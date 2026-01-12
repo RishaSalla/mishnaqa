@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
         config: null
     };
 
-    // --- LOGIC: SECURITY & CONFIG ---
+    // --- 1. SYSTEM LOGIC: SECURITY & CONFIG ---
     async function loadConfig() {
         try {
             const response = await fetch('config.json');
@@ -22,6 +22,8 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log("Config loaded successfully.");
         } catch (e) {
             console.error("Failed to load config", e);
+            // في حال عدم وجود ملف كونفج، يمكن اظهار خطأ أو السماح باللعب (حسب رغبتك)
+            // هنا سنظهر خطأ في حقل الدخول
             $('#login-error').innerText = "خطأ في الاتصال بالخادم";
         }
     }
@@ -54,17 +56,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const hashedInput = await hashString(input);
         
-        // التحقق من المصفوفة في ملف الكونفج
         if (gameState.config.valid_hashes.includes(hashedInput)) {
             // Success
             $('#login-overlay').style.opacity = '0';
             setTimeout(() => {
                 $('#login-overlay').classList.add('hidden');
                 $('#app').classList.remove('hidden');
-                // مهلة بسيطة لعمل الانيميشن ثم اظهار التطبيق
                 setTimeout(() => {
                      $('#app').classList.remove('opacity-0');
-                     resizeBoard(); // Ensure size is correct
+                     resizeBoard(); 
                 }, 100);
             }, 500);
         } else {
@@ -77,51 +77,81 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- LOGIC: RESPONSIVE SCALER ---
+    // --- 2. SYSTEM LOGIC: RESPONSIVE SCALER ---
     function resizeBoard() {
         const scaler = $('#game-scaler');
         const app = $('#app');
         if (!scaler || !app) return;
 
-        // الأبعاد الأصلية التي صممت اللعبة عليها
         const baseWidth = 450; 
         const baseHeight = 800; 
-
-        // أبعاد الشاشة الحالية
         const availableWidth = window.innerWidth;
         const availableHeight = window.innerHeight;
 
-        // حساب نسبة التكبير/التصغير
         const scaleX = availableWidth / baseWidth;
         const scaleY = availableHeight / baseHeight;
         
-        // نختار النسبة الأصغر لضمان ظهور اللعبة بالكامل
-        // ونضع حداً أقصى للتكبير (مثلاً 1.2) حتى لا تصبح ضخمة جداً على الشاشات الكبيرة
         const scale = Math.min(scaleX, scaleY, 1.2); 
 
-        // تطبيق التحويل
         scaler.style.transform = `scale(${scale})`;
-        
-        // توسيط العنصر اذا كانت الشاشة أكبر
-        // (يتم التعامل معه تلقائياً بواسطة Flexbox في الـ CSS الخاص بـ #app)
     }
 
-    // --- EXISTING GAME LOGIC ---
+    // --- 3. GAME CONTENT: EXPANDED WORD BANK ---
     const ARABIC_LETTERS = ['ا', 'ب', 'ت', 'ث', 'ج', 'ح', 'خ', 'د', 'ذ', 'ر', 'ز', 'س', 'ش', 'ص', 'ض', 'ط', 'ظ', 'ع', 'غ', 'ف', 'ق', 'ك', 'ل', 'م', 'ن', 'ه', 'و', 'ي', 'ء'];
     
     const WORD_BANK = {
-        "حيوانات": ["فيل", "زرافة", "تمساح", "أخطبوط", "كنغر", "بطريق", "أسد", "نمر", "ذئب", "ثعلب", "أرنب", "غزال", "فهد", "ضفدع", "بومة", "عقاب", "صقر", "غوريلا"],
-        "دول": ["مصر", "السعودية", "المغرب", "الإمارات", "فلسطين", "الجزائر", "الأردن", "لبنان", "سوريا", "الكويت", "قطر", "البحرين", "عمان", "اليمن", "العراق", "تونس", "ليبيا", "السودان"],
-        "فواكه": ["تفاح", "موز", "برتقال", "مانجو", "بطيخ", "فراولة", "عنب", "توت", "كرز", "خوخ", "مشمش", "تين", "بلح", "رمان", "كيوي", "أناناس", "شمام", "كمثرى"],
-        "ألوان": ["أحمر", "أزرق", "أخضر", "أصفر", "برتقالي", "بنفسجي", "وردي", "بني", "رمادي", "أبيض", "أسود", "ذهبي", "فضي"],
-        "أطعمة": ["خبز", "أرز", "لحم", "دجاج", "سمك", "معكرونة", "بيتزا", "ساندويتش", "سلطة", "حساء", "جبن", "بيض", "خضار", "فلافل", "شاورما"],
-        "مهن": ["طبيب", "مهندس", "معلم", "شرطي", "طباخ", "سائق", "نجار", "حداد", "خياط", "مزارع", "صحفي", "فنان", "كاتب", "طيار", "محاسب"]
+        "حيوانات": [
+            "فيل", "زرافة", "تمساح", "أخطبوط", "كنغر", "بطريق", "أسد", "نمر", "ذئب", "ثعلب", 
+            "أرنب", "غزال", "فهد", "ضفدع", "بومة", "عقاب", "صقر", "غوريلا", "دلفين", "حوت", 
+            "قرش", "جمل", "حصان", "سنجاب", "قنفذ", "خفاش", "راكون", "باندا", "كوكاتو", "طاووس"
+        ],
+        "دول": [
+            "مصر", "السعودية", "المغرب", "الإمارات", "فلسطين", "الجزائر", "الأردن", "لبنان", "سوريا", 
+            "الكويت", "قطر", "البحرين", "عمان", "اليمن", "العراق", "تونس", "ليبيا", "السودان", 
+            "الصين", "اليابان", "إيطاليا", "فرنسا", "ألمانيا", "البرازيل", "إسبانيا", "تركيا", "الهند", "روسيا"
+        ],
+        "فواكه": [
+            "تفاح", "موز", "برتقال", "مانجو", "بطيخ", "فراولة", "عنب", "توت", "كرز", "خوخ", 
+            "مشمش", "تين", "بلح", "رمان", "كيوي", "أناناس", "شمام", "كمثرى", "جوافة", "ليمون", 
+            "أفوكادو", "جوز الهند", "بابايا", "برقوق"
+        ],
+        "ألوان": [
+            "أحمر", "أزرق", "أخضر", "أصفر", "برتقالي", "بنفسجي", "وردي", "بني", "رمادي", "أبيض", 
+            "أسود", "ذهبي", "فضي", "بيج", "تركواز", "سماوي", "كحلي", "نبيذي", "عسلي"
+        ],
+        "أطعمة": [
+            "خبز", "أرز", "لحم", "دجاج", "سمك", "معكرونة", "بيتزا", "ساندويتش", "سلطة", "حساء", 
+            "جبن", "بيض", "خضار", "فلافل", "شاورما", "برجر", "سوشي", "بطاطس", "زبادي", "عسل", 
+            "مربى", "بسكويت", "كعك", "فطيرة", "شوكولاتة"
+        ],
+        "مهن": [
+            "طبيب", "مهندس", "معلم", "شرطي", "طباخ", "سائق", "نجار", "حداد", "خياط", "مزارع", 
+            "صحفي", "فنان", "كاتب", "طيار", "محاسب", "مبرمج", "محامي", "ممرض", "صيدلي", "رائد فضاء", 
+            "حلاق", "سباك", "كهربائي", "مصور", "مخرج"
+        ],
+        "فضاء": [
+            "شمس", "قمر", "أرض", "مريخ", "زحل", "مشتري", "مجرة", "نجم", "نيزك", "صاروخ", 
+            "فضاء", "كوكب", "ثقب أسود", "تلسكوب", "مركبة", "جاذبية", "مدار"
+        ],
+        "رياضة": [
+            "كرة قدم", "سباحة", "تنس", "كرة سلة", "ركض", "ملاكمة", "جودو", "كرة طائرة", "جمباز", 
+            "فروسية", "رماية", "مصارعة", "كاراتيه", "تزلج", "دراجات", "تسلق"
+        ],
+        "طبيعة": [
+            "بحر", "نهر", "جبل", "غابة", "صحراء", "شجرة", "وردة", "سحاب", "مطر", "ثلج", 
+            "رعد", "برق", "شلال", "بركان", "كهف", "وادي", "جزيرة", "بحيرة", "صخرة"
+        ],
+        "تكنولوجيا": [
+            "حاسوب", "هاتف", "انترنت", "روبوت", "شاشة", "لوحة مفاتيح", "ماوس", "سماعة", "كاميرا", 
+            "تطبيق", "موقع", "برنامج", "بطارية", "شاحن", "واي فاي", "بلوتوث"
+        ]
     };
+
+    // --- 4. CORE FUNCTIONS ---
 
     function showPage(pageId) {
         Object.values(pages).forEach(p => p.classList.remove('active'));
         pages[pageId].classList.add('active');
-        // Recalculate layout after page switch mainly for keyboard/hangman alignment
         setTimeout(resizeBoard, 50); 
     }
 
@@ -146,73 +176,58 @@ document.addEventListener('DOMContentLoaded', () => {
             container.appendChild(letter);
         }
     }
-function init() {
-        // Load Config Immediately
+
+    // --- 5. INITIALIZATION (Fixed Logic) ---
+    function init() {
         loadConfig();
         
-        // Listeners for Login
+        // Login Logic
         $('#login-btn').addEventListener('click', handleLogin);
         $('#access-code-input').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') handleLogin();
         });
 
-        // Resize Listener
         window.addEventListener('resize', resizeBoard);
-        
-        // Initial Effect
         createBackgroundEffects();
 
-        // --- مستمعات الأحداث (Event Listeners) ---
-
-        // أزرار اختيار الوضع (فردي / جماعي)
+        // Mode Buttons
         $$('.mode-btn').forEach(btn => {
             btn.addEventListener('click', (e) => selectMode(e.target.dataset.mode));
         });
 
-        // زر بدء اللعب وزر تأكيد الكلمة
+        // Start & Confirm
         $('#start-game-btn').addEventListener('click', startGame);
         $('#confirm-word-btn').addEventListener('click', handleWordConfirmation);
 
-        // أزرار "كيف ألعب" (فتح وإغلاق)
+        // How to Play
         $('#how-to-play-btn').addEventListener('click', () => $('#how-to-play-modal').showModal());
         $('#close-how-to-play-btn').addEventListener('click', () => $('#how-to-play-modal').close());
 
-        // ⚠️ زر العودة للرئيسية
+        // HOME BUTTON (With Confirmation)
         $('#game-home-btn').addEventListener('click', () => {
             if (confirm("هل أنت متأكد من الخروج؟ سيتم إلغاء اللعبة الحالية!")) {
                 showPage('landing');
             }
         });
 
-        // أزرار التنقل الأخرى
+        // Navigation
         $('#back-to-landing-btn').addEventListener('click', () => showPage('landing'));
+        $('#game-over-home-btn').addEventListener('click', () => { $('#game-over-modal').close(); showPage('landing'); });
+        $('#next-action-btn').addEventListener('click', () => { $('#game-over-modal').close(); prepareNextRound(); });
 
-        // أزرار شاشة "نهاية اللعبة"
-        $('#game-over-home-btn').addEventListener('click', () => {
-            $('#game-over-modal').close();
-            showPage('landing');
-        });
-
-        $('#next-action-btn').addEventListener('click', () => {
-            $('#game-over-modal').close();
-            prepareNextRound();
-        });
-
-        // زر التلميح
+        // Hints & Suggestions
         $('#hint-btn').addEventListener('click', () => {
             if (gameState.hint) {
                 $('#hint-text').innerText = gameState.hint;
                 $('#hint-modal').showModal();
             }
         });
-
-        // --- (هنا كان الخطأ: تم حذف القوس الزائد) ---
-
         $('#close-hint-btn').addEventListener('click', () => $('#hint-modal').close());
         $('#suggest-word-btn').addEventListener('click', showWordSuggestions);
         $('#close-suggestion-btn').addEventListener('click', () => $('#word-suggestion-modal').close());
         $('#close-alert-btn').addEventListener('click', () => $('#alert-modal').close());
 
+        // Password Toggle
         const passwordInput = $('#secret-word-input');
         const togglePassword = $('#toggle-password');
         togglePassword.addEventListener('click', () => {
@@ -221,6 +236,8 @@ function init() {
             togglePassword.textContent = type === 'password' ? '👁️' : '🙈';
         });
     }
+
+    // --- 6. GAME LOGIC ---
 
     function selectMode(mode) {
         setupGame(mode);
