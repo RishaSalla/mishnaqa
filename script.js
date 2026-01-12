@@ -163,21 +163,50 @@ document.addEventListener('DOMContentLoaded', () => {
         // Initial Effect
         createBackgroundEffects();
 
-        // Standard Game Listeners
-        $$('.mode-btn').forEach(btn => btn.addEventListener('click', (e) => selectMode(e.target.dataset.mode)));
-        $('#start-game-btn').addEventListener('click', startGame);
-        $('#confirm-word-btn').addEventListener('click', handleWordConfirmation);
-        $('#how-to-play-btn').addEventListener('click', () => $('#how-to-play-modal').showModal());
-        $('#close-how-to-play-btn').addEventListener('click', () => $('#how-to-play-modal').close());
-        $('#game-home-btn').addEventListener('click', () => { showPage('landing'); });
-        $('#back-to-landing-btn').addEventListener('click', () => showPage('landing'));
-        $('#game-over-home-btn').addEventListener('click', () => { $('#game-over-modal').close(); showPage('landing'); });
-        $('#next-action-btn').addEventListener('click', () => { $('#game-over-modal').close(); prepareNextRound(); });
-        $('#hint-btn').addEventListener('click', () => {
-            if (gameState.hint) {
-                $('#hint-text').innerText = gameState.hint;
-                $('#hint-modal').showModal();
-            }
+        // --- مستمعات الأحداث (Event Listeners) ---
+
+// أزرار اختيار الوضع (فردي / جماعي)
+$$('.mode-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => selectMode(e.target.dataset.mode));
+});
+
+// زر بدء اللعب وزر تأكيد الكلمة
+$('#start-game-btn').addEventListener('click', startGame);
+$('#confirm-word-btn').addEventListener('click', handleWordConfirmation);
+
+// أزرار "كيف ألعب" (فتح وإغلاق)
+$('#how-to-play-btn').addEventListener('click', () => $('#how-to-play-modal').showModal());
+$('#close-how-to-play-btn').addEventListener('click', () => $('#how-to-play-modal').close());
+
+// ⚠️ زر العودة للرئيسية أثناء اللعب (تم التعديل لإضافة التأكيد)
+$('#game-home-btn').addEventListener('click', () => {
+    // التحقق من حالة اللعب: إذا كان اللاعب في وسط اللعبة، نطلب التأكيد
+    if (confirm("هل أنت متأكد من الخروج؟ سيتم إلغاء اللعبة الحالية!")) {
+        showPage('landing');
+    }
+});
+
+// أزرار التنقل الأخرى
+$('#back-to-landing-btn').addEventListener('click', () => showPage('landing'));
+
+// أزرار شاشة "نهاية اللعبة"
+$('#game-over-home-btn').addEventListener('click', () => {
+    $('#game-over-modal').close();
+    showPage('landing');
+});
+
+$('#next-action-btn').addEventListener('click', () => {
+    $('#game-over-modal').close();
+    prepareNextRound();
+});
+
+// زر التلميح
+$('#hint-btn').addEventListener('click', () => {
+    if (gameState.hint) {
+        $('#hint-text').innerText = gameState.hint;
+        $('#hint-modal').showModal();
+    }
+});
         });
         $('#close-hint-btn').addEventListener('click', () => $('#hint-modal').close());
         $('#suggest-word-btn').addEventListener('click', showWordSuggestions);
